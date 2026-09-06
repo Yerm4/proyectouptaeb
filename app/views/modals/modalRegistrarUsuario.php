@@ -13,7 +13,10 @@
 
                     <label for="tipo" class="action-card__label">Tipo de Usuario
                         <select class="action-card__select" id="tipo" name="tipo" required>
-                            <?php $t = isset($inputs['tipo']) ? (string)$inputs['tipo'] : ''; ?>
+                            <?php 
+                            $tipos = $tipos ?? [];
+                            $t = isset($inputs['tipo']) ? (string)$inputs['tipo'] : ''; 
+                            ?>
                             <option value="" <?php echo ($t === '') ? 'selected' : ''; ?> disabled>Seleccione...</option>
                             <?php 
                             foreach ($tipos as $tipo): 

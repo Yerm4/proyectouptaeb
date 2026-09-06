@@ -39,28 +39,29 @@ class ViewController {
 
     public function showPerfil() {
 
-        global $tieneGestionarUsuarios, $tieneVerConsultas, $tieneGestionarRolesPermisos, $tieneModificarConsulta;
+        global $tieneGestionarUsuarios, $tieneVerConsultas, $tieneGestionarRolesPermisos, $tieneModificarConsulta, $tieneGenerarReportes, $tieneRealizarConsulta;
         $this->auth();
         $consultaModel = new Consulta($this->pdo);
         $stats = [];
         $consultasRecientesDashboard = [];
         $misConsultas = [];
+        $misCondiciones = [];
 
-        // 2. Lógica del Controlador: Buscar datos según el tipo de usuario
         if (!$tieneGestionarUsuarios && !$tieneVerConsultas && !$tieneGestionarRolesPermisos) {
-            // Es un paciente
             $misConsultas = $consultaModel->obtenerConsultasPorPaciente($_SESSION["cedula"]);
+            $misCondiciones = $consultaModel->obtenerCondicionesPaciente($_SESSION["cedula"]);
         } else {
-            // Es personal médico / administrativo
             $stats = $consultaModel->obtenerEstadisticasDashboard();
             $consultasRecientesDashboard = $consultaModel->obtenerConsultasRecientes(5);
         }
+
+        $userModel = new Usuario($this->pdo);
+        $tipos = $userModel->obtenerTipos();
 
         $paginaActual = 'perfil';
         $inputs = isset($_SESSION['inputs']) ? $_SESSION['inputs'] : [];
         unset($_SESSION['inputs']);
         
-        // 3. Renderizamos la Vista (Corregimos la ruta, quitando la carpeta 'dashboard/')
         include __DIR__ . "/../views/perfil.php";
     }
 
@@ -84,29 +85,32 @@ class ViewController {
     }
 
     public function showConsultas($userModel = null, $permisos = null) {
-        
+        global $tieneGestionarUsuarios, $tieneVerConsultas, $tieneGestionarRolesPermisos, $tieneModificarConsulta, $tieneGenerarReportes, $tieneRealizarConsulta;
         $pnfModel = new NucleoPNF($this->pdo);
         $userModel = new Usuario($this->pdo);
+        $consultaModel = new Consulta($this->pdo);
 
         $nucleos = $pnfModel->obtenerNucleos();
         $pnfs = $pnfModel->obtenerPNFS();
         
         $tipos = $userModel->obtenerTipos();
         $data = $userModel->consultarUsuarios();
+        $consultasRecientes = $consultaModel->obtenerConsultasRecientes(20);
         
         include __DIR__ . "/../views/consultas.php";
     }
 
-    public function showConfiguracion($userModel, $permisos) {
-        extract($permisos);
+    public function showConfiguracion($partesRuta = null) {
+        global $tieneGestionarRolesPermisos, $tieneGestionarCondiciones;
+        $userModel = new Usuario($this->pdo);
         $roles = [];
-        $permisosLista = [];
+        $permisos = [];
         $rolePermMap = [];
         $condicionesRegistradas = [];
 
         if ($tieneGestionarRolesPermisos) {
             $roles = $userModel->obtenerRoles();
-            $permisosLista = $userModel->obtenerPermisos();
+            $permisos = $userModel->obtenerPermisos();
             $rolesPermisos = $userModel->obtenerRolesPermisos();
             foreach ($rolesPermisos as $rp) {
                 $rolePermMap[$rp['id_rol']][$rp['id_permiso']] = true;
@@ -121,9 +125,11 @@ class ViewController {
         include __DIR__ . "/../views/configuracion.php";
     }
 
-    public function showOferta($userModel, $permisos) {
-        extract($permisos);
+    public function showOferta($partesRuta = null, $permisos = null) {
+        global $tieneGestionarOferta;
         $modeloOfertas = new NucleoPNF($this->pdo);
+        $nucleos = $modeloOfertas->obtenerNucleos();
+        $pnfs = $modeloOfertas->obtenerPNFS();
         $ofertas = $modeloOfertas->obtenerOfertasActivas();
 
         $paginaActual = 'oferta';

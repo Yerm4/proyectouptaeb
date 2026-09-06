@@ -22,12 +22,13 @@ include_once __DIR__."/layout/header.php";
             <div class="section-1__box transition" id="section-1-box">
                 
                     <div class="box-iniciar-consulta" style="display: flex; gap: 10px;">
-                        
+                        <?php if (!empty($tieneRealizarConsulta) || !empty($GLOBALS['tieneRealizarConsulta'])): ?>
                             <a name="openModal" data-modal="modalRegistrarConsulta" class="action-card__button action-card__button--grid-principal btn-iniciar-consulta" href="#">Iniciar consulta</a>
+                        <?php endif; ?>
                         
-                        
+                        <?php if (!empty($tieneGenerarReportes) || !empty($GLOBALS['tieneGenerarReportes'])): ?>
                             <a name="openModal" data-modal="modalReporteMorbilidad" class="action-card__button btn-generar-reporte" href="#" style="background-color: #0284c7; width: fit-content; text-align: center;">Generar Reporte</a>
-                        
+                        <?php endif; ?>
                     </div>
                 
             </div>
@@ -100,5 +101,16 @@ include_once __DIR__."/layout/header.php";
         <?php include_once __DIR__."/modals/modalVerDetallesConsulta.php"; ?>
         <?php include_once __DIR__."/modals/modalBuscarConsulta.php"; ?>
         
+        <?php if (!empty($tieneGenerarReportes) || !empty($GLOBALS['tieneGenerarReportes'])): ?>
         <?php include_once __DIR__."/modals/modalReporteMorbilidad.php"; ?>
+        <?php endif; ?>
+
+    <script>
+        const ES_MEDICO_O_DIRECTOR = <?= isset($tieneModificarConsulta) && $tieneModificarConsulta ? 'true' : 'false' ?>;
+    </script>
 </main>
+
+<footer>
+    <script src="assets/script/append.js" defer></script>
+    <script src="assets/script/gestion.js" defer></script>
+</footer>

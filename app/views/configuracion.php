@@ -1,3 +1,17 @@
+<?php
+if (!isset($_SESSION["cedula"])) {
+    header("Location: login");
+    exit;
+}
+
+$titulo = "Configuración";
+include_once __DIR__."/layout/header.php";
+?>
+
+<main class="perfil">    
+    <?php include_once __DIR__."/layout/sidebar.php"; ?>
+
+    <section class="section-1 section-1--perfil">
 <div id="seccion-configuracion" class="configuracion-container seccion-configuracion-box">
     <div class="nested-tabs-menu menu-subtabs">
         <?php if ($tieneGestionarRolesPermisos): ?>
@@ -96,19 +110,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($permisos as $perm): ?>
-                            <tr class="tr-body-consultas">
-                                <td>
-                                    <div><?= e($perm['nombre_permiso']) ?></div>
-                                    <small><?= e($perm['descripcion_permiso']) ?></small>
-                                </td>
-                                <?php foreach ($roles as $role): ?>
+                        <?php if (!empty($permisos)): ?>
+                            <?php foreach ($permisos as $perm): ?>
+                                <tr class="tr-body-consultas">
                                     <td>
-                                        <input type="checkbox" name="permisos[<?= $role['id_rol'] ?>][]" value="<?= $perm['id_permiso'] ?>" <?= isset($rolePermMap[$role['id_rol']][$perm['id_permiso']]) ? 'checked' : '' ?>>
+                                        <div><?= e($perm['nombre_permiso']) ?></div>
+                                        <small><?= e($perm['descripcion_permiso']) ?></small>
                                     </td>
-                                <?php endforeach; ?>
-                            </tr>
-                        <?php endforeach; ?>
+                                    <?php foreach ($roles as $role): ?>
+                                        <td>
+                                            <input type="checkbox" name="permisos[<?= $role['id_rol'] ?>][]" value="<?= $perm['id_permiso'] ?>" <?= isset($rolePermMap[$role['id_rol']][$perm['id_permiso']]) ? 'checked' : '' ?>>
+                                        </td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
                 <button type="submit" class="action-card__button">Guardar Matriz de Permisos</button>
@@ -156,3 +172,11 @@
         </div>
     <?php endif; ?>
 </div>
+    </section>
+
+    <?php include_once __DIR__."/modals/modalEditarRol.php"; ?>
+    <?php include_once __DIR__."/modals/modalEditarCondicion.php"; ?>
+    <?php include_once __DIR__."/modals/modalRegistrarCondicion.php"; ?>
+    <script src="assets/script/append.js" defer></script>
+    <script src="assets/script/gestion.js" defer></script>
+</main>

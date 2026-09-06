@@ -232,7 +232,7 @@ class ConsultaController {
             $fechaFinFmt = date('d/m/Y', strtotime($fechaFin));
             $fechaEmision = date('d/m/Y H:i:s');
 
-            $logoPath = 'C:/Users/draku/Desktop/git/proyectouptaeb/public/assets/media/img/uptaeb.jpg';
+            $logoPath = __DIR__ . '/../../public/assets/media/img/uptaeb.jpg';
             $logoHtml = '<div style="width:55px;height:55px;background:#1e3a8a;color:#fff;font-weight:bold;font-size:16px;line-height:55px;text-align:center;border-radius:4px;">UPTAEB</div>';
             if (file_exists($logoPath)) {
                 $ld = base64_encode(file_get_contents($logoPath));

@@ -85,7 +85,7 @@ $rolUsuario = $defaultRol;
 
 if (isset($_SESSION['cedula'])) {
     $datosUsuarioLogueado = $userModel->login($_SESSION['cedula']);
-    $rolUsuario = isset($datosUsuarioLogueado['rol']) ? (int)$datosUsuarioLogueado['rol'] : $defaultRol;
+    $rolUsuario = isset($datosUsuarioLogueado['data']['rol']) ? (int)$datosUsuarioLogueado['data']['rol'] : (isset($datosUsuarioLogueado['rol']) ? (int)$datosUsuarioLogueado['rol'] : $defaultRol);
 
     $tieneGestionarUsuarios = checkPerm("gestionar_usuarios", $userModel);
     $tieneVerConsultas = checkPerm("ver_consultas", $userModel);
@@ -98,7 +98,7 @@ if (isset($_SESSION['cedula'])) {
 }
 
 if (!isset($_SESSION['cedula'])) {
-    if (in_array($paginaActual, ["perfil", "usuarios", "consultas", "configuracion", "sesion", "condiciones", "oferta", "sedes-carreras"])) {
+    if (in_array($paginaActual, ["perfil", "usuarios", "consultas", "configuracion", "sesion", "condiciones", "oferta", "sedes", "sedes-carreras"])) {
         header("Location: login");
         exit();
     }
@@ -115,7 +115,7 @@ if (!isset($_SESSION['cedula'])) {
         header("Location: perfil");
         exit();
     }
-    if (($paginaActual === "oferta" || $paginaActual === "sedes-carreras") && !$tieneGestionarOferta) { 
+    if (($paginaActual === "oferta" || $paginaActual === "sedes" || $paginaActual === "sedes-carreras") && !$tieneGestionarOferta) { 
         header("Location: perfil");
         exit();
     }
@@ -124,7 +124,8 @@ if (!isset($_SESSION['cedula'])) {
 
 
 if (isset($_SESSION['cedula'])) {
-    if (!isset($_SESSION['user_agent']) || $_SESSION['user_agent'] !== $_SERVER['HTTP_USER_AGENT']) {
+    $currentUa = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    if (!isset($_SESSION['user_agent']) || $_SESSION['user_agent'] !== $currentUa) {
         session_unset();
         session_destroy();
         header("Location: login");

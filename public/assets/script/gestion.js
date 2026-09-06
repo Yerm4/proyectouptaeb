@@ -37,15 +37,12 @@ checkCargarMasVisibility();
 if (inputBuscarC && cuerpoTablaConsultas) {
     inputBuscarC.addEventListener('input', function() {
         const textoBusqueda = inputBuscarC.value.trim();
-        const tokenCSRF = document.querySelector('input[name="csrf_token"]').value;
+        const tokenCSRF = document.querySelector('input[name="csrf_token"]')?.value || '';
 
-        fetch('index.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `csrf_token=${tokenCSRF}&form=buscar_consultas&query=${encodeURIComponent(textoBusqueda)}&offset=0`
-        })
+        fetch(`api/consulta?query=${encodeURIComponent(textoBusqueda)}`)
         .then(response => response.json())
-        .then(consultas => {
+        .then(res => {
+            const consultas = Array.isArray(res) ? res : (res.data || []);
             cuerpoTablaConsultas.innerHTML = '';
 
             if (consultas.length === 0) {
@@ -107,15 +104,12 @@ if (btnCargarMas && cuerpoTablaConsultas) {
     btnCargarMas.addEventListener('click', function() {
         const query = inputBuscarC ? inputBuscarC.value.trim() : '';
         const offset = cuerpoTablaConsultas.querySelectorAll('tr:not(.no-registros)').length;
-        const tokenCSRF = document.querySelector('input[name="csrf_token"]').value;
+        const tokenCSRF = document.querySelector('input[name="csrf_token"]')?.value || '';
 
-        fetch('index.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `csrf_token=${tokenCSRF}&form=buscar_consultas&query=${encodeURIComponent(query)}&offset=${offset}`
-        })
+        fetch(`api/consulta?query=${encodeURIComponent(query)}&offset=${offset}`)
         .then(response => response.json())
-        .then(consultas => {
+        .then(res => {
+            const consultas = Array.isArray(res) ? res : (res.data || []);
             if (consultas.length === 0) {
                 btnCargarMas.style.display = 'none';
                 return;
@@ -175,18 +169,15 @@ if (cuerpoTablaConsultas && modalActualizarConsulta) {
         if (event.target.classList.contains('ver-detalles-consulta')) {
             event.preventDefault();
             const idConsulta = event.target.getAttribute('data-id');
-            const tokenCSRF = document.querySelector('input[name="csrf_token"]').value;
+            const tokenCSRF = document.querySelector('input[name="csrf_token"]')?.value || '';
             const modalVer = document.getElementById('modalVerDetallesConsulta');
 
-            fetch('index.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `csrf_token=${tokenCSRF}&form=obtener_consulta&id=${idConsulta}`
-            })
+            fetch(`api/consulta/${idConsulta}`)
             .then(response => response.json())
-            .then(consulta => {
-                if (consulta.error) {
-                    alert(consulta.error);
+            .then(res => {
+                const consulta = res.data || res;
+                if (consulta.error || res.status === 'error') {
+                    alert(consulta.error || res.message);
                     return;
                 }
 
@@ -236,15 +227,12 @@ if (cuerpoTablaConsultas && modalActualizarConsulta) {
             const idConsulta = event.target.getAttribute('data-id');
             const tokenCSRF = document.querySelector('input[name="csrf_token"]').value;
 
-            fetch('index.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `csrf_token=${tokenCSRF}&form=obtener_consulta&id=${idConsulta}`
-            })
+            fetch(`api/consulta/${idConsulta}`)
             .then(response => response.json())
-            .then(consulta => {
-                if (consulta.error) {
-                    alert(consulta.error);
+            .then(res => {
+                const consulta = res.data || res;
+                if (consulta.error || res.status === 'error') {
+                    alert(consulta.error || res.message);
                     return;
                 }
 
@@ -374,13 +362,10 @@ function cargarPnfsPorNucleo(idNucleo, selectPnfElement, pnfSeleccionado = null)
 
     const tokenCSRF = document.querySelector('input[name="csrf_token"]').value;
 
-    fetch('index.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `csrf_token=${tokenCSRF}&form=obtener_pnfs_por_nucleo&id_nucleo=${idNucleo}`
-    })
+    fetch(`api/nucleos/pnfs/${idNucleo}`)
     .then(response => response.json())
-    .then(pnfs => {
+    .then(res => {
+        const pnfs = Array.isArray(res) ? res : (res.data || []);
         if (Array.isArray(pnfs) && pnfs.length > 0) {
             selectPnfElement.disabled = false;
             pnfs.forEach(pnf => {

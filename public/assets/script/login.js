@@ -143,10 +143,27 @@ const loginForm = document.getElementById("loginForm")
 if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault()
+        const submitBtn = loginForm.querySelector('button[type="submit"]')
+        const originalBtnText = submitBtn ? submitBtn.textContent : 'Ingresar al sistema'
+        
+        let msgBox = document.getElementById("loginAlert")
+        if (!msgBox) {
+            msgBox = document.createElement("div")
+            msgBox.id = "loginAlert"
+            msgBox.style.cssText = "margin-bottom: 12px; padding: 10px; border-radius: 6px; font-size: 14px; font-weight: 500; text-align: center;"
+            loginForm.prepend(msgBox)
+        }
+        msgBox.style.display = "none"
+
         const formData = new FormData(loginForm)
         const datos = Object.fromEntries(formData.entries())
     
         try {
+            if (submitBtn) {
+                submitBtn.disabled = true
+                submitBtn.textContent = "Ingresando..."
+            }
+
             const response = await fetch("api/auth/login", {
                 method: "POST",
                 headers: {
@@ -157,25 +174,39 @@ if (loginForm) {
             
             const result = await response.json().catch(() => null)
             
-            if (!response.ok) {
-                const error = result?.message || response.status + ": " + response.statusText
-                msg(loginMessage, error)
-                throw new Error(error)
+            if (!response.ok || !result || result.status !== "ok") {
+                const error = result?.message || "Usuario o contraseña incorrectos"
+                msgBox.textContent = error
+                msgBox.style.backgroundColor = "#fee2e2"
+                msgBox.style.color = "#991b1b"
+                msgBox.style.border = "1px solid #f87171"
+                msgBox.style.display = "block"
+                if (submitBtn) {
+                    submitBtn.disabled = false
+                    submitBtn.textContent = originalBtnText
+                }
+                return
             }
             
-            if (!result) throw new Error("La respuesta no fue JSON")
-            
-            if (result.status === "ok") {
-                const data = result.data
-                console.log(result.message)
-                setTimeout(() => {
-                    window.location.reload()
-                }, 2000)
-            } else {
-                throw new Error (result.message)
-            }
+            msgBox.textContent = "¡Bienvenido! Redirigiendo..."
+            msgBox.style.backgroundColor = "#dcfce7"
+            msgBox.style.color = "#166534"
+            msgBox.style.border = "1px solid #86efac"
+            msgBox.style.display = "block"
+
+            const destino = result.redirect || "perfil"
+            window.location.href = destino
         } catch(error) {
-            console.error(error)
+            console.error("Error en login:", error)
+            msgBox.textContent = "Error al conectar con el servidor"
+            msgBox.style.backgroundColor = "#fee2e2"
+            msgBox.style.color = "#991b1b"
+            msgBox.style.border = "1px solid #f87171"
+            msgBox.style.display = "block"
+            if (submitBtn) {
+                submitBtn.disabled = false
+                submitBtn.textContent = originalBtnText
+            }
         }
     })
 }
@@ -185,11 +216,27 @@ const signupForm = document.getElementById("registroUsuarioForm")
 if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
         e.preventDefault()
+        const submitBtn = signupForm.querySelector('button[type="submit"]')
+        const originalBtnText = submitBtn ? submitBtn.textContent : 'Registrar'
+
+        let alertBox = signupForm.querySelector(".signup-alert")
+        if (!alertBox) {
+            alertBox = document.createElement("div")
+            alertBox.className = "signup-alert"
+            alertBox.style.cssText = "margin-bottom: 12px; padding: 10px; border-radius: 6px; font-size: 14px; font-weight: 500; text-align: center;"
+            signupForm.prepend(alertBox)
+        }
+        alertBox.style.display = "none"
 
         const formData = new FormData(signupForm)
         const datos = Object.fromEntries(formData.entries())
 
         try {
+            if (submitBtn) {
+                submitBtn.disabled = true
+                submitBtn.textContent = "Registrando..."
+            }
+
             const response = await fetch("api/users", {
                 method: "POST",
                 headers: {
@@ -200,23 +247,40 @@ if (signupForm) {
             
             const result = await response.json().catch(() => null)
 
-            if (!response.ok) {
-                const error = result?.message || response.status + ": " + response.statusText
-                msg(signUpMessage, error)
-                throw new Error(error)
+            if (!response.ok || !result || result.status !== "ok") {
+                const error = result?.message || (response.status + ": " + response.statusText)
+                alertBox.textContent = error
+                alertBox.style.backgroundColor = "#fee2e2"
+                alertBox.style.color = "#991b1b"
+                alertBox.style.border = "1px solid #f87171"
+                alertBox.style.display = "block"
+                if (submitBtn) {
+                    submitBtn.disabled = false
+                    submitBtn.textContent = originalBtnText
+                }
+                return
             }
 
-            if (!result) throw new Error("La respuesta no es JSON")
+            alertBox.textContent = result.message || "Usuario registrado con éxito"
+            alertBox.style.backgroundColor = "#dcfce7"
+            alertBox.style.color = "#166534"
+            alertBox.style.border = "1px solid #86efac"
+            alertBox.style.display = "block"
 
-            if (result.status === "ok") {
-                const data = result.data
-                console.log(result.message)
-                setTimeout(() => {
-                    window.location.reload()
-                }, 2000)
-            }
+            setTimeout(() => {
+                window.location.reload()
+            }, 1000)
         } catch (error) {
-            console.error(error)
+            console.error("Error en registro:", error)
+            alertBox.textContent = "Error al conectar con el servidor"
+            alertBox.style.backgroundColor = "#fee2e2"
+            alertBox.style.color = "#991b1b"
+            alertBox.style.border = "1px solid #f87171"
+            alertBox.style.display = "block"
+            if (submitBtn) {
+                submitBtn.disabled = false
+                submitBtn.textContent = originalBtnText
+            }
         }
     })
 }
