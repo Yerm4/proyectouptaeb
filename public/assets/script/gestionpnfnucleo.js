@@ -322,6 +322,7 @@ const configurarEnvioFormularioNucleo = (idForm, idModal, msgExitoDefault) => {
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
+        const datos = Object.fromEntries(formData.entries())
         const modal = document.getElementById(idModal);
 
     try {
