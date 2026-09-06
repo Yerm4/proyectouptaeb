@@ -268,7 +268,7 @@ if (signupForm) {
             alertBox.style.display = "block"
 
             setTimeout(() => {
-                window.location.reload()
+                window.location.href = "perfil"
             }, 1000)
         } catch (error) {
             console.error("Error en registro:", error)

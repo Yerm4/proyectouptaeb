@@ -5,9 +5,13 @@
 
 RewriteEngine On
 
-RewriteRule ^$ public/index.php [L,QSA]
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} !^localhost$
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-RewriteRule ^index\.php$ public/index.php [L,QSA]
+RewriteRule ^$ public/index.php?ruta= [L,QSA]
+
+RewriteRule ^index\.php$ public/index.php?ruta= [L,QSA]
 
 RewriteRule ^assets/(.*)$ public/assets/$1 [L]
 
@@ -21,7 +25,3 @@ RewriteRule ^(.*)$ public/index.php?ruta=$1 [L,QSA]
         Header set Cache-Control "no-cache, must-revalidate"
     </FilesMatch>
 </IfModule>
-
-RewriteEngine On
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

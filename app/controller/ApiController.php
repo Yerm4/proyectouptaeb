@@ -6,6 +6,10 @@ use app\model\NucleoPNF;
 use app\model\Usuario;
 use app\model\Consulta;
 use app\model\Condicion;
+use app\controller\ConsultaController;
+use app\controller\CondicionController;
+use app\controller\NucleoPNFController;
+use app\controller\ViewController;
 
 class ApiController {
     private $pdo;
@@ -151,6 +155,9 @@ class ApiController {
         );
 
         if ($resultado["status"] === "ok") {
+            session_regenerate_id(true);
+            $_SESSION["cedula"] = $cedula;
+            $_SESSION["user_agent"] = $_SERVER['HTTP_USER_AGENT'] ?? '';
             code(201);
             $this->jsonResponse("ok", $resultado["message"] ?? $resultado["msg"] ?? "Usuario registrado con éxito");
         } else {
@@ -501,7 +508,7 @@ class ApiController {
 
         $_POST['fecha_inicio'] = $fechaInicio;
         $_POST['fecha_fin'] = $fechaFin;
-        $controllerConsulta = new \app\controller\ConsultaController($this->pdo);
+        $controllerConsulta = new ConsultaController($this->pdo);
         $controllerConsulta->generarReporteMorbilidad();
         exit();
     }

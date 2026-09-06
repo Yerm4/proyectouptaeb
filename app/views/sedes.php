@@ -1,5 +1,4 @@
 <?php
-use app\controller\Controller;
 
 if (!$_SESSION["cedula"]) {
     header("Location: login");

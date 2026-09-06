@@ -38,7 +38,7 @@ $apiController = new ApiController($pdo);
 
 $method = !empty($_SERVER["REQUEST_METHOD"]) ? $_SERVER["REQUEST_METHOD"] : "";
 
-$rutasApi = require __DIR__ . "/../form.php";
+$rutasApi = require __DIR__ . "/../app/api.php";
 if (!is_array($rutasApi)) {
     global $rutasApi;
 }
@@ -52,6 +52,10 @@ if (isset($_GET["ruta"]) && $_GET["ruta"] !== '') {
         $ruta = "login";
     }
 }
+
+$ruta = isset($_GET["ruta"]) && $_GET["ruta"] !== '' ? trim($_GET["ruta"], "/") : "login";
+
+
 $partesRuta = explode("/", $ruta);
 $paginaActual = $partesRuta[0];
 $GLOBALS['paginaActual'] = $paginaActual;

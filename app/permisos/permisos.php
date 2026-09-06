@@ -1,7 +1,5 @@
 <?php
 
-
-use app\controller\Controller;
 use app\controller\ConsultaController;
 use app\controller\CondicionController;
 use app\controller\NucleoPNFController;
@@ -12,7 +10,6 @@ use app\model\Usuario;
 use app\config\Config;
 
 $pdo = Config::conexion(); 
-$controller = new Controller($pdo);
 $controllerConsulta = new ConsultaController($pdo);
 $controllerOferta = new NucleoPNFController($pdo);
 
